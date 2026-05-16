@@ -9,6 +9,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
 kotlin = "2.3.21"
 composeBom = "2026.05.00"
+coil = "3.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,8 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 dev-zacsweers-metro-runtime = { group = "dev.zacsweers.metro", name = "runtime", version.ref = "metro" }
 dev-zacsweers-metrox-android = { group = "dev.zacsweers.metro", name = "metrox-android", version.ref = "metro" }
 dev-zacsweers-metrox-viewmodel-compose = { group = "dev.zacsweers.metro", name = "metrox-viewmodel-compose", version.ref = "metro" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
 [plugins]
 metro = { id = "dev.zacsweers.metro", version.ref = "metro" }

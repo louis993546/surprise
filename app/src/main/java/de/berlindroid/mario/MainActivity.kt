@@ -68,7 +68,6 @@ fun AppContent() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF2C1E11)) // Dark wood-like background for the "table"
-            .padding(48.dp) // Margin around the book
     ) {
         HorizontalPager(
             state = pagerState,
