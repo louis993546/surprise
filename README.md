@@ -1,6 +1,6 @@
-# Mario's Farewell Card
+# Mario's Thank You Card
 
-A digital farewell card for Mario, built with Jetpack Compose. Designed to be displayed on a giant tablet (TCL Nxtpaper 14) as a physical-style book with realistic page-flip physics.
+A digital thank you card for Mario, built with Jetpack Compose. Designed to be displayed on a giant tablet (TCL Nxtpaper 14) as a physical-style book with realistic page-flip physics.
 
 ## How to contribute a Page
 

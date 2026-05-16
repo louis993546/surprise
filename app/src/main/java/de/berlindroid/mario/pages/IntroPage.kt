@@ -21,7 +21,7 @@ object IntroPage : Page {
     override fun LeftContent() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Farewell, Mario!",
+                text = "Thank you, Mario!",
                 style = MaterialTheme.typography.displayLarge
             )
         }
@@ -31,8 +31,9 @@ object IntroPage : Page {
     override fun RightContent() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Flip to see the messages.",
-                style = MaterialTheme.typography.headlineMedium
+                text = "Thank you for all the years of hard work.\nWe will still see you around as an attendee instead of organizer!",
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
     }

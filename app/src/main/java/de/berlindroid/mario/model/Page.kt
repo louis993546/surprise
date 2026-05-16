@@ -3,7 +3,7 @@ package de.berlindroid.mario.model
 import androidx.compose.runtime.Composable
 
 /**
- * Represents a two-page spread in the farewell book.
+ * Represents a two-page spread in the thank you book.
  * 
  * Each [Page] implementation is automatically discovered via Metro DI if annotated with 
  * `@ContributesBinding(AppScope::class)`.

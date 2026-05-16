@@ -1,6 +1,6 @@
-# AI Agent Instructions for Mario's Farewell Card
+# AI Agent Instructions for Mario's Thank You Card
 
-This project is a collaborative digital farewell card. When assisting with this project, please adhere to the following guidelines to ensure consistency and compatibility with the target hardware.
+This project is a collaborative digital thank you card. When assisting with this project, please adhere to the following guidelines to ensure consistency and compatibility with the target hardware.
 
 ## Core Mandates
 
