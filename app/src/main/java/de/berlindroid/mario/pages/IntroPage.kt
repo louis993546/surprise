@@ -9,19 +9,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
+import de.berlindroid.mario.model.PageCategory
 import dev.zacsweers.metro.ContributesIntoSet
 
 @ContributesIntoSet(AppScope::class)
 object IntroPage : Page {
     override val title: String = "Welcome"
     override val author: String = "The Maintainers"
-    override val order: Int = 0
+    override val category: PageCategory = PageCategory.Cover
 
     @Composable
     override fun LeftContent() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Farewell, Mario!",
+                text = "Thank you, Mario!",
                 style = MaterialTheme.typography.displayLarge
             )
         }
@@ -31,8 +32,9 @@ object IntroPage : Page {
     override fun RightContent() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Flip to see the messages.",
-                style = MaterialTheme.typography.headlineMedium
+                text = "Thank you for all the years of hard work.\nWe will still see you around as an attendee instead of organizer!",
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
     }
