@@ -5,11 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import de.berlindroid.mario.di.AppGraph
 import de.berlindroid.mario.ui.theme.MarioTheme
-import de.berlindroid.mario.MarioApplication
+import timber.log.Timber
 import kotlin.math.absoluteValue
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
@@ -50,8 +54,9 @@ class MainActivity : ComponentActivity() {
 fun AppContent() {
     val appGraph = LocalAppGraph.current
     val pages = remember(appGraph) { 
-        val list = appGraph.pages.sortedBy { it.order }
-        android.util.Log.d("MarioBook", "Discovered ${list.size} pages (sorted): ${list.map { "${it.title}(${it.order})" }}")
+        val list = appGraph.pages.sortedBy { it.category.weight }
+        Timber.tag("MarioBook")
+            .d("Discovered ${list.size} pages (sorted): ${list.map { "${it.title}(${it.category::class.simpleName})" }}")
         list
     }
     

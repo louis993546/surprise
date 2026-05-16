@@ -8,7 +8,7 @@ This project is a collaborative digital thank you card. When assisting with this
 - **Contribution Workflow:** 
     1. Create a new `object` implementing the `Page` interface in the `de.berlindroid.mario.pages` package.
     2. Add the `@ContributesIntoSet(AppScope::class)` annotation to your object.
-    3. Use the `order` property to position your page. Lower numbers (e.g., 0-10) are for the beginning, default is 100.
+    3. Use the `category` property to group your page (e.g., `PageCategory.Community`).
 - **Language:** English and German are the primary languages.
 - **Philosophy:** This is a "frozen in time" gift. **BE CREATIVE.** 
     - The UI is a "Book" where each contributor gets a **full spread** (2 pages side-by-side).
@@ -25,10 +25,17 @@ Located in `de.berlindroid.mario.model.Page`:
 interface Page {
     val title: String
     val author: String
-    val order: Int get() = 100
+    val category: PageCategory get() = PageCategory.Community
     
     @Composable fun LeftContent()
     @Composable fun RightContent()
+}
+
+sealed class PageCategory(val weight: Int) {
+    data object Cover : PageCategory(0)
+    data object Intro : PageCategory(10)
+    data object Community : PageCategory(100)
+    data object Outro : PageCategory(1000)
 }
 ```
 

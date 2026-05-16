@@ -13,7 +13,7 @@ We want you to be as creative as possible! The app is a "frozen in time" gift, s
     object YourNamePage : Page {
         override val title: String = "Your Title"
         override val author: String = "Your Name"
-        override val order: Int = 100 // Lower numbers come first (Cover is 0)
+        override val category: PageCategory = PageCategory.Community
 
         @Composable
         override fun LeftContent() {

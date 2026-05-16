@@ -9,13 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
+import de.berlindroid.mario.model.PageCategory
 import dev.zacsweers.metro.ContributesIntoSet
 
 @ContributesIntoSet(AppScope::class)
 object IntroPage : Page {
     override val title: String = "Welcome"
     override val author: String = "The Maintainers"
-    override val order: Int = 0
+    override val category: PageCategory = PageCategory.Cover
 
     @Composable
     override fun LeftContent() {
