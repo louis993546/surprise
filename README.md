@@ -40,3 +40,7 @@ The app looks like a physical book with two pages side-by-side.
 
 - **Builds:** Pull Requests trigger automated builds to ensure compatibility.
 - **Dependency Injection:** We use **Metro DI**.
+
+## Credits & Acknowledgements
+
+The realistic 3D book-esque page-flip animation is heavily inspired by and adapted from the amazing [FlipBoardAnimation](https://github.com/sinasamaki/FlipBoardAnimation) by [Sina Samaki](https://github.com/sinasamaki).
