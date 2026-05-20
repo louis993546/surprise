@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":flutter"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout.compose)

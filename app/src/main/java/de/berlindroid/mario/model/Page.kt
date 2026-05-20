@@ -15,6 +15,9 @@ sealed class PageCategory(val weight: Int) {
     /** General pages contributed by the community. */
     data object Community : PageCategory(100)
 
+    /** Pages that should be positioned almost at the end. */
+    data object AlmostOutro : PageCategory(900)
+
     /** Closing pages. */
     data object Outro : PageCategory(1000)
 }
