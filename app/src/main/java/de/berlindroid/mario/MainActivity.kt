@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -25,11 +25,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import de.berlindroid.mario.di.AppGraph
+import de.berlindroid.mario.ui.flip.FlipPager
+import de.berlindroid.mario.ui.flip.FlipPagerOrientation
 import de.berlindroid.mario.ui.theme.MarioTheme
 import timber.log.Timber
-import kotlin.math.absoluteValue
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
     error("AppGraph not provided")
@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppContent() {
     val appGraph = LocalAppGraph.current
@@ -74,44 +75,15 @@ fun AppContent() {
             .fillMaxSize()
             .background(Color(0xFF2C1E11)) // Dark wood-like background for the "table"
     ) {
-        HorizontalPager(
+        FlipPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
-            pageSpacing = 0.dp,
-            beyondViewportPageCount = 1
+            orientation = FlipPagerOrientation.Horizontal
         ) { index ->
             val page = pages[index]
-            
-            // Page Flip Physics Simulation using GraphicsLayer
-            val pageOffset = (
-                (pagerState.currentPage - index) + pagerState.currentPageOffsetFraction
-            )
-            
+
             Card(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        // 3D rotation effect
-                        rotationY = lerp(
-                            start = 0f,
-                            stop = -180f,
-                            fraction = pageOffset.coerceIn(-1f, 1f)
-                        )
-                        
-                        // Pivot on the center binding line
-                        transformOrigin = androidx.compose.ui.graphics.TransformOrigin(
-                            pivotFractionX = if (pageOffset > 0) 1f else 0f,
-                            pivotFractionY = 0.5f
-                        )
-                        
-                        // Hide backface when flipped
-                        alpha = if (pageOffset.absoluteValue > 0.5f) 0f else 1f
-                        
-                        // Scale slightly to simulate depth
-                        val scale = lerp(1f, 0.95f, pageOffset.absoluteValue)
-                        scaleX = scale
-                        scaleY = scale
-                    },
+                modifier = Modifier.fillMaxSize(),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
                 elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
