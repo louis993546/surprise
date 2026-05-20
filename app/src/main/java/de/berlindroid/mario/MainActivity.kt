@@ -12,6 +12,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -30,6 +37,7 @@ import de.berlindroid.mario.ui.flip.FlipPager
 import de.berlindroid.mario.ui.flip.FlipPagerOrientation
 import de.berlindroid.mario.ui.theme.MarioTheme
 import timber.log.Timber
+import kotlin.math.absoluteValue
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
     error("AppGraph not provided")
@@ -55,9 +63,9 @@ class MainActivity : ComponentActivity() {
 fun AppContent() {
     val appGraph = LocalAppGraph.current
     val pages = remember(appGraph) { 
-        val list = appGraph.pages.sortedBy { it.order }
+        val list = appGraph.pages.sortedBy { it.category.weight }
         Timber.tag("MarioBook")
-            .d("Discovered ${list.size} pages (sorted): ${list.map { "${it.title}(${it.order})" }}")
+            .d("Discovered ${list.size} pages (sorted): ${list.map { "${it.title}(${it.category::class.simpleName})" }}")
         list
     }
     
@@ -81,7 +89,7 @@ fun AppContent() {
             orientation = FlipPagerOrientation.Horizontal
         ) { index ->
             val page = pages[index]
-            
+
             Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),

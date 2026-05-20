@@ -12,7 +12,7 @@ import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
 
 /**
- * Template for a new page in the farewell book.
+ * Template for a new page in the thank you book.
  *
  * To add your own page:
  * 1. Copy this file and rename it (e.g., YourNamePage.kt).
