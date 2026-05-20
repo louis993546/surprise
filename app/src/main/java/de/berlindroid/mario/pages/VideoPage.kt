@@ -1,21 +1,30 @@
 package de.berlindroid.mario.pages
 
 import android.net.Uri
+import android.view.LayoutInflater
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.ClosedCaption
+import androidx.compose.material.icons.filled.ClosedCaptionDisabled
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -42,6 +52,8 @@ import androidx.media3.ui.PlayerView
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
+import androidx.core.net.toUri
+import de.berlindroid.mario.R
 
 /**
  * A beautiful, dynamic page that shows a thank you message on the left
@@ -75,9 +87,6 @@ object VideoPage : Page {
 
     override val title: String = "A Video Message"
     override val author: String = "Your Name"
-
-    // CHANGE THIS: Replace with your actual video filename in `app/src/main/res/raw/` (without the .mp4 extension)
-    private const val videoResourceName = "mario_video"
 
     @Composable
     override fun LeftContent() {
@@ -128,10 +137,12 @@ object VideoPage : Page {
         var isPlaying by remember { mutableStateOf(false) }
         var isVideoPrepared by remember { mutableStateOf(false) }
         
+        // Track controller states
+        var isMuted by remember { mutableStateOf(false) }
+        var isCcEnabled by remember { mutableStateOf(true) }
+        
         // Resolve raw resource ID
-        val resourceId = remember {
-            context.resources.getIdentifier(videoResourceName, "raw", context.packageName)
-        }
+        val resourceId = R.raw.video
 
         Box(
             modifier = Modifier
@@ -142,7 +153,7 @@ object VideoPage : Page {
             if (resourceId != 0) {
                 // Initialize ExoPlayer
                 val exoPlayer = remember {
-                    val mediaUri = Uri.parse("android.resource://${context.packageName}/$resourceId")
+                    val mediaUri = "android.resource://${context.packageName}/$resourceId".toUri()
                     ExoPlayer.Builder(context).build().apply {
                         setMediaItem(MediaItem.fromUri(mediaUri))
                         repeatMode = Player.REPEAT_MODE_ALL
@@ -192,11 +203,10 @@ object VideoPage : Page {
                     ) {
                         AndroidView(
                             factory = { ctx ->
-                                PlayerView(ctx).apply {
-                                    player = exoPlayer
-                                    useController = false // Custom styling controls via our overlay
-                                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                                }
+                                LayoutInflater.from(ctx).inflate(R.layout.texture_video_player, null) as PlayerView
+                            },
+                            update = { playerView ->
+                                playerView.player = exoPlayer
                             },
                             modifier = Modifier.fillMaxSize()
                         )
@@ -215,6 +225,37 @@ object VideoPage : Page {
                                     tint = Color.White,
                                     modifier = Modifier.fillMaxSize(0.2f)
                                 )
+                            }
+                        }
+
+                        // Quick Controls Overlay (Top Right)
+                        if (isVideoPrepared) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    // Mute / Unmute Button
+                                    IconButton(
+                                        onClick = {
+                                            isMuted = !isMuted
+                                            exoPlayer.volume = if (isMuted) 0f else 1f
+                                        },
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = Color.Black.copy(alpha = 0.6f),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = if (isMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
+                                            contentDescription = if (isMuted) "Unmute" else "Mute"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -241,7 +282,7 @@ object VideoPage : Page {
                         Text(
                             text = "To play a video here using Media3:\n\n" +
                                    "1. Create the folder 'raw' inside 'app/src/main/res/'\n" +
-                                   "2. Drop your MP4 file named '$videoResourceName.mp4' into it\n" +
+                                   "2. Drop your MP4 file into it\n" +
                                    "3. Rebuild and run the app!",
                             fontSize = 18.sp,
                             lineHeight = 28.sp,
