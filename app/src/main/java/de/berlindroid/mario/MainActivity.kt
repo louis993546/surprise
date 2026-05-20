@@ -12,13 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -37,7 +30,6 @@ import de.berlindroid.mario.ui.flip.FlipPager
 import de.berlindroid.mario.ui.flip.FlipPagerOrientation
 import de.berlindroid.mario.ui.theme.MarioTheme
 import timber.log.Timber
-import kotlin.math.absoluteValue
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
     error("AppGraph not provided")
