@@ -50,6 +50,48 @@ object MohsenoidPage : Page {
     private val TerminalGreen = Color(0xFF4AF626)
     private val TerminalBlue = Color(0xFF81D4FA)
     private val TerminalBg = Color(0xFF0C0C0C)
+    private val TerminalYellow = Color(0xFFFFD54F)
+    private val TerminalCyan = Color(0xFF4DD0E1)
+    private val TerminalMagenta = Color(0xFFF06292)
+
+    private fun highlightTerminalText(text: String): androidx.compose.ui.text.AnnotatedString {
+        return buildAnnotatedString {
+            append(text)
+
+            // 1. Highlight File Extensions (.sh, .py, .kt, etc)
+            Regex("\\.[a-zA-Z0-9]+").findAll(text).forEach { match ->
+                addStyle(SpanStyle(color = TerminalCyan), match.range.first, match.range.last + 1)
+            }
+
+            // 2. Highlight Paths (/etc/, ./path/)
+            Regex("(/|\\./)[\\w/\\.-]+").findAll(text).forEach { match ->
+                addStyle(SpanStyle(color = TerminalBlue), match.range.first, match.range.last + 1)
+            }
+
+            // 3. Highlight Success/Status Keywords
+            listOf("Success", "SUCCESS", "GOAT", "Legendary Organizer", "Legend", "Moving").forEach { word ->
+                Regex("\\b$word\\b").findAll(text).forEach { match ->
+                    addStyle(
+                        SpanStyle(color = TerminalGreen, fontWeight = FontWeight.Bold),
+                        match.range.first,
+                        match.range.last + 1
+                    )
+                }
+            }
+
+            // 4. Highlight Years
+            Regex("\\b(20\\d{2})\\b").findAll(text).forEach { match ->
+                addStyle(SpanStyle(color = TerminalYellow), match.range.first, match.range.last + 1)
+            }
+
+            // 5. Highlight Code Keywords
+            listOf("val", "Int.MAX_VALUE").forEach { word ->
+                Regex(Regex.escape(word)).findAll(text).forEach { match ->
+                    addStyle(SpanStyle(color = TerminalMagenta), match.range.first, match.range.last + 1)
+                }
+            }
+        }
+    }
 
     @Composable
     private fun RowScope.TerminalCursor() {
@@ -242,6 +284,25 @@ object MohsenoidPage : Page {
             scrollState.scrollTo(scrollState.maxValue)
         }
 
+        val styledMessage = remember(visibleText) {
+            buildAnnotatedString {
+                val lines = visibleText.split("\n")
+                lines.forEachIndexed { index, line ->
+                    val isHeader = index < 5
+                    val isFooter = index >= lines.size - 1 && lines.size > 15
+                    
+                    if (isHeader || isFooter) {
+                        append(highlightTerminalText(line))
+                    } else {
+                        withStyle(style = SpanStyle(color = TerminalBlue)) {
+                            append(line)
+                        }
+                    }
+                    if (index < lines.size - 1) append("\n")
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -251,8 +312,7 @@ object MohsenoidPage : Page {
         ) {
             if (isStarted) {
                 Text(
-                    text = visibleText,
-                    color = TerminalBlue,
+                    text = styledMessage,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Monospace,
                     lineHeight = 30.sp
@@ -301,7 +361,7 @@ object MohsenoidPage : Page {
     @Composable
     private fun TerminalOutput(text: String) {
         Text(
-            text = text,
+            text = highlightTerminalText(text),
             color = Color.LightGray,
             fontFamily = FontFamily.Monospace,
             fontSize = 16.sp,
