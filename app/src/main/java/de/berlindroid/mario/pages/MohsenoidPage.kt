@@ -44,9 +44,10 @@ import kotlinx.coroutines.delay
 
 @ContributesIntoSet(AppScope::class)
 object MohsenoidPage : Page {
-    override val title: String = "The CLI Chronicles"
+    override val title: String = "The Terminal Chronicles"
     override val author: String = "@mohsenoid"
 
+    // --- Styling Constants ---
     private val TerminalGreen = Color(0xFF4AF626)
     private val TerminalBlue = Color(0xFF81D4FA)
     private val TerminalBg = Color(0xFF0C0C0C)
@@ -54,56 +55,11 @@ object MohsenoidPage : Page {
     private val TerminalCyan = Color(0xFF4DD0E1)
     private val TerminalMagenta = Color(0xFFF06292)
 
-    private fun highlightTerminalText(text: String): androidx.compose.ui.text.AnnotatedString {
-        return buildAnnotatedString {
-            append(text)
+    private val TerminalFontSizeCommand = 18.sp
+    private val TerminalFontSizeOutput = 16.sp
+    private val TerminalFontSizeMessage = 20.sp
 
-            // 1. Highlight File Extensions (.sh, .py, .kt, etc)
-            Regex("\\.[a-zA-Z0-9]+").findAll(text).forEach { match ->
-                addStyle(SpanStyle(color = TerminalCyan), match.range.first, match.range.last + 1)
-            }
-
-            // 2. Highlight Paths (/etc/, ./path/)
-            Regex("(/|\\./)[\\w/\\.-]+").findAll(text).forEach { match ->
-                addStyle(SpanStyle(color = TerminalBlue), match.range.first, match.range.last + 1)
-            }
-
-            // 3. Highlight Success/Status Keywords
-            listOf("Success", "SUCCESS", "GOAT", "Legendary Organizer", "Legend", "Moving").forEach { word ->
-                Regex("\\b$word\\b").findAll(text).forEach { match ->
-                    addStyle(
-                        SpanStyle(color = TerminalGreen, fontWeight = FontWeight.Bold),
-                        match.range.first,
-                        match.range.last + 1
-                    )
-                }
-            }
-
-            // 4. Highlight Years
-            Regex("\\b(20\\d{2})\\b").findAll(text).forEach { match ->
-                addStyle(SpanStyle(color = TerminalYellow), match.range.first, match.range.last + 1)
-            }
-
-            // 5. Highlight Code Keywords
-            listOf("val", "Int.MAX_VALUE").forEach { word ->
-                Regex(Regex.escape(word)).findAll(text).forEach { match ->
-                    addStyle(SpanStyle(color = TerminalMagenta), match.range.first, match.range.last + 1)
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun RowScope.TerminalCursor() {
-        Box(
-            modifier = Modifier
-                .size(width = 10.dp, height = 20.dp)
-                .background(Color.White)
-                .padding(start = 2.dp)
-                .align(Alignment.CenterVertically)
-        )
-    }
-
+    // --- Data Structures ---
     private sealed class TerminalLine {
         data class Command(val text: String) : TerminalLine()
         data class Output(val text: String) : TerminalLine()
@@ -143,6 +99,10 @@ object MohsenoidPage : Page {
         TerminalLine.Spacer,
     )
 
+    private val LeftAnimationFinished = mutableStateOf(false)
+
+    // --- Content Composables ---
+
     @Composable
     override fun LeftContent() {
         val pagerState = LocalPagerState.current
@@ -155,7 +115,6 @@ object MohsenoidPage : Page {
 
         LaunchedEffect(isVisible) {
             if (isVisible) {
-                // Reset all states when entering the page
                 LeftAnimationFinished.value = false
                 visibleLines = emptyList()
                 isLeftFinished = false
@@ -163,21 +122,17 @@ object MohsenoidPage : Page {
                 leftLines.forEach { line ->
                     when (line) {
                         is TerminalLine.Command -> {
-                            line.text.forEachIndexed { index, _ ->
-                                val typed = line.text.substring(0, index + 1)
-                                if (visibleLines.lastOrNull()?.first == line) {
-                                    visibleLines = visibleLines.dropLast(1) + (line to typed)
-                                } else {
-                                    visibleLines = visibleLines + (line to typed)
-                                }
-                                delay(80) // Slower typing
+                            line.text.indices.forEach { i ->
+                                val typed = line.text.substring(0, i + 1)
+                                visibleLines = visibleLines.updateLastOrAdd(line, typed)
+                                delay(80)
                             }
-                            delay(500) // Pause after command
+                            delay(500)
                         }
 
                         is TerminalLine.Output -> {
                             visibleLines = visibleLines + (line to line.text)
-                            delay(200) // Slower output
+                            delay(200)
                         }
 
                         is TerminalLine.Spacer -> {
@@ -186,10 +141,9 @@ object MohsenoidPage : Page {
                     }
                 }
                 isLeftFinished = true
-                delay(500) // Pause before triggering right side
+                delay(500)
                 LeftAnimationFinished.value = true
             } else {
-                // Reset states when page is hidden
                 LeftAnimationFinished.value = false
                 visibleLines = emptyList()
                 isLeftFinished = false
@@ -200,11 +154,6 @@ object MohsenoidPage : Page {
             scrollState.animateScrollTo(scrollState.maxValue)
         }
 
-        // We use a side effect to notify the RightContent, but in this architecture 
-        // we can use a more robust approach if RightContent and LeftContent shared a VM.
-        // For now, let's use a simple composition-local or similar if needed, 
-        // but since they are in the same object, we can manage it.
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -213,15 +162,11 @@ object MohsenoidPage : Page {
                 .verticalScroll(scrollState)
         ) {
             visibleLines.forEachIndexed { index, (line, text) ->
-                val isLast = index == visibleLines.size - 1
+                val isAnimating = index == visibleLines.size - 1 && !isLeftFinished
                 when (line) {
-                    is TerminalLine.Command -> {
-                        Row {
-                            TerminalPrompt(text)
-                            if (isLast && !isLeftFinished) {
-                                TerminalCursor()
-                            }
-                        }
+                    is TerminalLine.Command -> Row {
+                        TerminalPrompt(text)
+                        if (isAnimating) TerminalCursor()
                     }
 
                     is TerminalLine.Output -> TerminalOutput(text)
@@ -231,17 +176,9 @@ object MohsenoidPage : Page {
 
             if (isLeftFinished) {
                 BlinkingCursorPrompt()
-                // Update a global/shared state if we want RightContent to react.
-                // Since LeftContent and RightContent are called independently by the Pager, 
-                // we should ideally use a shared state.
-                LaunchedEffect(Unit) {
-                    LeftAnimationFinished.value = true
-                }
             }
         }
     }
-
-    private val LeftAnimationFinished = mutableStateOf(false)
 
     @Composable
     override fun RightContent() {
@@ -251,11 +188,11 @@ object MohsenoidPage : Page {
             > Initializing farewell sequence...
             > Analyzing 11 years of impact...
             
-            Hey Mario,
+            Dear Mario,
             
             Since I moved into Berlin I joined the community you brought together and enjoyed since then. 
             
-            Thanks for all the great work all these years. We will miss your creative ideas at droidcon berlins.
+            Thanks for all the great work all these years. We will miss your creative ideas at DroidCon Berlins.
             
             Wishing you a 'successful build' in your next adventure at SRH University and Yubico!
             
@@ -270,16 +207,15 @@ object MohsenoidPage : Page {
 
         LaunchedEffect(isStarted) {
             if (isStarted) {
-                fullMessage.forEachIndexed { index, _ ->
-                    visibleText = fullMessage.substring(0, index + 1)
-                    delay(if (fullMessage[index] == '\n') 150 else 40) // Slower typing
+                fullMessage.indices.forEach { i ->
+                    visibleText = fullMessage.substring(0, i + 1)
+                    delay(if (fullMessage[i] == '\n') 150 else 40)
                 }
             } else {
-                visibleText = "" // Reset text if not started
+                visibleText = ""
             }
         }
 
-        // Auto-scroll as text grows
         LaunchedEffect(visibleText) {
             scrollState.scrollTo(scrollState.maxValue)
         }
@@ -289,8 +225,8 @@ object MohsenoidPage : Page {
                 val lines = visibleText.split("\n")
                 lines.forEachIndexed { index, line ->
                     val isHeader = index < 5
-                    val isFooter = index >= lines.size - 1 && lines.size > 15
-                    
+                    val isFooter = line.startsWith("--") || line.contains("Transmission")
+
                     if (isHeader || isFooter) {
                         append(highlightTerminalText(line))
                     } else {
@@ -313,7 +249,7 @@ object MohsenoidPage : Page {
             if (isStarted) {
                 Text(
                     text = styledMessage,
-                    fontSize = 20.sp,
+                    fontSize = TerminalFontSizeMessage,
                     fontFamily = FontFamily.Monospace,
                     lineHeight = 30.sp
                 )
@@ -333,28 +269,20 @@ object MohsenoidPage : Page {
         }
     }
 
+    // --- Helper Composables ---
+
     @Composable
     private fun TerminalPrompt(command: String) {
         Text(
             text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color.White)) {
-                    append("mario@berlindroid")
-                }
-                withStyle(style = SpanStyle(color = TerminalBlue)) {
-                    append(":")
-                }
-                withStyle(style = SpanStyle(color = Color.Yellow)) {
-                    append("~")
-                }
-                withStyle(style = SpanStyle(color = Color.White)) {
-                    append("$ ")
-                }
-                withStyle(style = SpanStyle(color = TerminalGreen)) {
-                    append(command)
-                }
+                withStyle(style = SpanStyle(color = Color.White)) { append("mario@berlindroid") }
+                withStyle(style = SpanStyle(color = TerminalBlue)) { append(":") }
+                withStyle(style = SpanStyle(color = TerminalYellow)) { append("~") }
+                withStyle(style = SpanStyle(color = Color.White)) { append("$ ") }
+                withStyle(style = SpanStyle(color = TerminalGreen)) { append(command) }
             },
             fontFamily = FontFamily.Monospace,
-            fontSize = 18.sp
+            fontSize = TerminalFontSizeCommand
         )
     }
 
@@ -364,8 +292,19 @@ object MohsenoidPage : Page {
             text = highlightTerminalText(text),
             color = Color.LightGray,
             fontFamily = FontFamily.Monospace,
-            fontSize = 16.sp,
+            fontSize = TerminalFontSizeOutput,
             modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+
+    @Composable
+    private fun RowScope.TerminalCursor() {
+        Box(
+            modifier = Modifier
+                .size(width = 10.dp, height = 20.dp)
+                .background(Color.White)
+                .padding(start = 2.dp)
+                .align(Alignment.CenterVertically)
         )
     }
 
@@ -390,6 +329,47 @@ object MohsenoidPage : Page {
                     .background(Color.White.copy(alpha = alpha))
                     .align(Alignment.CenterVertically)
             )
+        }
+    }
+
+    // --- Logic Helpers ---
+
+    private fun highlightTerminalText(text: String): androidx.compose.ui.text.AnnotatedString {
+        return buildAnnotatedString {
+            append(text)
+
+            // Patterns to highlight
+            val highlights = listOf(
+                Regex("\\.[a-zA-Z0-9]+") to TerminalCyan, // Extensions
+                Regex("(/|\\./)[\\w/\\.-]+") to TerminalBlue, // Paths
+                Regex("\\b(Success|SUCCESS|GOAT|Legendary Organizer|Legend|Moving)\\b") to TerminalGreen, // Status
+                Regex("\\b(20\\d{2})\\b") to TerminalYellow, // Years
+                Regex("val|Int\\.MAX_VALUE") to TerminalMagenta // Keywords
+            )
+
+            highlights.forEach { (regex, color) ->
+                regex.findAll(text).forEach { match ->
+                    addStyle(
+                        SpanStyle(
+                            color = color,
+                            fontWeight = if (color == TerminalGreen) FontWeight.Bold else FontWeight.Normal
+                        ),
+                        match.range.first,
+                        match.range.last + 1
+                    )
+                }
+            }
+        }
+    }
+
+    private fun List<Pair<TerminalLine, String>>.updateLastOrAdd(
+        line: TerminalLine,
+        text: String
+    ): List<Pair<TerminalLine, String>> {
+        return if (this.lastOrNull()?.first == line) {
+            this.dropLast(1) + (line to text)
+        } else {
+            this + (line to text)
         }
     }
 }
