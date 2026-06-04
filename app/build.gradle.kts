@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.navigation.suite)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.fonts)
     implementation(libs.dev.zacsweers.metro.runtime)
     implementation(libs.dev.zacsweers.metrox.android)
     implementation(libs.dev.zacsweers.metrox.viewmodel.compose)
