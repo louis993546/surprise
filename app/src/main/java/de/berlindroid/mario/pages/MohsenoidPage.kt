@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.berlindroid.mario.LocalPageIndex
+import de.berlindroid.mario.LocalPagerState
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
@@ -101,44 +103,55 @@ object MohsenoidPage : Page {
 
     @Composable
     override fun LeftContent() {
+        val pagerState = LocalPagerState.current
+        val pageIndex = LocalPageIndex.current
+        val isVisible = pagerState.currentPage == pageIndex
+
         var visibleLines by remember { mutableStateOf<List<Pair<TerminalLine, String>>>(emptyList()) }
         var isLeftFinished by remember { mutableStateOf(false) }
         val scrollState = rememberScrollState()
 
-        LaunchedEffect(Unit) {
-            // Reset all states when entering the page
-            LeftAnimationFinished.value = false
-            visibleLines = emptyList()
-            isLeftFinished = false
+        LaunchedEffect(isVisible) {
+            if (isVisible) {
+                // Reset all states when entering the page
+                LeftAnimationFinished.value = false
+                visibleLines = emptyList()
+                isLeftFinished = false
 
-            leftLines.forEach { line ->
-                when (line) {
-                    is TerminalLine.Command -> {
-                        line.text.forEachIndexed { index, _ ->
-                            val typed = line.text.substring(0, index + 1)
-                            if (visibleLines.lastOrNull()?.first == line) {
-                                visibleLines = visibleLines.dropLast(1) + (line to typed)
-                            } else {
-                                visibleLines = visibleLines + (line to typed)
+                leftLines.forEach { line ->
+                    when (line) {
+                        is TerminalLine.Command -> {
+                            line.text.forEachIndexed { index, _ ->
+                                val typed = line.text.substring(0, index + 1)
+                                if (visibleLines.lastOrNull()?.first == line) {
+                                    visibleLines = visibleLines.dropLast(1) + (line to typed)
+                                } else {
+                                    visibleLines = visibleLines + (line to typed)
+                                }
+                                delay(80) // Slower typing
                             }
-                            delay(80) // Slower typing
+                            delay(500) // Pause after command
                         }
-                        delay(500) // Pause after command
-                    }
 
-                    is TerminalLine.Output -> {
-                        visibleLines = visibleLines + (line to line.text)
-                        delay(200) // Slower output
-                    }
+                        is TerminalLine.Output -> {
+                            visibleLines = visibleLines + (line to line.text)
+                            delay(200) // Slower output
+                        }
 
-                    is TerminalLine.Spacer -> {
-                        visibleLines = visibleLines + (line to "")
+                        is TerminalLine.Spacer -> {
+                            visibleLines = visibleLines + (line to "")
+                        }
                     }
                 }
+                isLeftFinished = true
+                delay(500) // Pause before triggering right side
+                LeftAnimationFinished.value = true
+            } else {
+                // Reset states when page is hidden
+                LeftAnimationFinished.value = false
+                visibleLines = emptyList()
+                isLeftFinished = false
             }
-            isLeftFinished = true
-            delay(500) // Pause before triggering right side
-            LeftAnimationFinished.value = true
         }
 
         LaunchedEffect(visibleLines) {
