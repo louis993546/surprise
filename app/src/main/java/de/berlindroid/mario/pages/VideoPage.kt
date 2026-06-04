@@ -1,13 +1,12 @@
 package de.berlindroid.mario.pages
 
-import android.net.Uri
 import android.view.LayoutInflater
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.ClosedCaption
-import androidx.compose.material.icons.filled.ClosedCaptionDisabled
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +25,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,18 +40,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.C
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
+import de.berlindroid.mario.LocalPageIndex
+import de.berlindroid.mario.LocalPagerState
+import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
-import androidx.core.net.toUri
-import de.berlindroid.mario.R
 
 /**
  * A beautiful, dynamic page that shows a thank you message on the left
@@ -107,9 +105,9 @@ object VideoPage : Page {
                     color = Color(0xFF3E2723), // Deep brown/bronze
                     textAlign = TextAlign.Center
                 )
-                
+
                 Spacer(modifier = Modifier.height(48.dp))
-                
+
                 Text(
                     text = "Words on paper are beautiful, but we wanted to send you a more personal greeting.\n\nTap the video on the right to play, pause, or loop it!",
                     fontSize = 24.sp,
@@ -117,9 +115,9 @@ object VideoPage : Page {
                     color = Color(0xFF5D4037),
                     textAlign = TextAlign.Center
                 )
-                
+
                 Spacer(modifier = Modifier.height(64.dp))
-                
+
                 Text(
                     text = "— Signed with gratitude",
                     fontSize = 20.sp,
@@ -134,13 +132,17 @@ object VideoPage : Page {
     @Composable
     override fun RightContent() {
         val context = LocalContext.current
+        val pagerState = LocalPagerState.current
+        val pageIndex = LocalPageIndex.current
+        val isVisible = pagerState.currentPage == pageIndex
+
         var isPlaying by remember { mutableStateOf(false) }
         var isVideoPrepared by remember { mutableStateOf(false) }
-        
+
         // Track controller states
         var isMuted by remember { mutableStateOf(false) }
         var isCcEnabled by remember { mutableStateOf(true) }
-        
+
         // Resolve raw resource ID
         val resourceId = R.raw.video
 
@@ -158,7 +160,16 @@ object VideoPage : Page {
                         setMediaItem(MediaItem.fromUri(mediaUri))
                         repeatMode = Player.REPEAT_MODE_ALL
                         prepare()
-                        playWhenReady = true // Auto-play when ready
+                        playWhenReady = false // Don't auto-play yet
+                    }
+                }
+
+                // Play or pause based on visibility
+                LaunchedEffect(isVisible) {
+                    if (isVisible) {
+                        exoPlayer.play()
+                    } else {
+                        exoPlayer.pause()
                     }
                 }
 
@@ -203,7 +214,8 @@ object VideoPage : Page {
                     ) {
                         AndroidView(
                             factory = { ctx ->
-                                LayoutInflater.from(ctx).inflate(R.layout.texture_video_player, null) as PlayerView
+                                LayoutInflater.from(ctx)
+                                    .inflate(R.layout.texture_video_player, null) as PlayerView
                             },
                             update = { playerView ->
                                 playerView.player = exoPlayer
@@ -281,9 +293,9 @@ object VideoPage : Page {
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
                             text = "To play a video here using Media3:\n\n" +
-                                   "1. Create the folder 'raw' inside 'app/src/main/res/'\n" +
-                                   "2. Drop your MP4 file into it\n" +
-                                   "3. Rebuild and run the app!",
+                                    "1. Create the folder 'raw' inside 'app/src/main/res/'\n" +
+                                    "2. Drop your MP4 file into it\n" +
+                                    "3. Rebuild and run the app!",
                             fontSize = 18.sp,
                             lineHeight = 28.sp,
                             color = Color.LightGray,
