@@ -1,0 +1,322 @@
+package de.berlindroid.mario.pages
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import de.berlindroid.mario.di.AppScope
+import de.berlindroid.mario.model.Page
+import dev.zacsweers.metro.ContributesIntoSet
+import kotlinx.coroutines.delay
+
+@ContributesIntoSet(AppScope::class)
+object MohsenoidPage : Page {
+    override val title: String = "The CLI Chronicles"
+    override val author: String = "@mohsenoid"
+
+    private val TerminalGreen = Color(0xFF4AF626)
+    private val TerminalBlue = Color(0xFF81D4FA)
+    private val TerminalBg = Color(0xFF0C0C0C)
+
+    @Composable
+    private fun RowScope.TerminalCursor() {
+        Box(
+            modifier = Modifier
+                .size(width = 10.dp, height = 20.dp)
+                .background(Color.White)
+                .padding(start = 2.dp)
+                .align(Alignment.CenterVertically)
+        )
+    }
+
+    private sealed class TerminalLine {
+        data class Command(val text: String) : TerminalLine()
+        data class Output(val text: String) : TerminalLine()
+        data object Spacer : TerminalLine()
+    }
+
+    private val leftLines = listOf(
+        TerminalLine.Command("whoami"),
+        TerminalLine.Output("Mario - The Berlindroid Legend"),
+        TerminalLine.Spacer,
+        TerminalLine.Command("uptime --community"),
+        TerminalLine.Output("11 years, 0 months, 0 days"),
+        TerminalLine.Output("Status: GOAT (Greatest Of All Time)"),
+        TerminalLine.Spacer,
+        TerminalLine.Command("ls /achievements"),
+        TerminalLine.Output("zebadge_hardware_hack.sh"),
+        TerminalLine.Output("zepatch_embroidery.py"),
+        TerminalLine.Output("daydream_ar_workshop.so"),
+        TerminalLine.Output("droidcon_booth_manager.bin"),
+        TerminalLine.Output("community_heart_and_soul.dmg"),
+        TerminalLine.Spacer,
+        TerminalLine.Command("grep -r \"Passion\" ./berlindroid"),
+        TerminalLine.Output("./berlindroid/mario.kt: val passion = Int.MAX_VALUE"),
+        TerminalLine.Output("./berlindroid/mario.kt: val contribution = \"11+ Years\""),
+        TerminalLine.Output("./berlindroid/mario.kt: val status = \"Legendary Organizer\""),
+        TerminalLine.Spacer,
+        TerminalLine.Command("history | tail -n 5"),
+        TerminalLine.Output("2015: First meetup in the corner"),
+        TerminalLine.Output("2018: Throwing birds as a pirate"),
+        TerminalLine.Output("2021: Keeping us connected online"),
+        TerminalLine.Output("2024: Teaching Software Engineering @ SRH"),
+        TerminalLine.Output("2026: Handing back the GDG gun, belt, and hat"),
+        TerminalLine.Spacer,
+        TerminalLine.Command("mv /home/mario/berlindroid /etc/init.d/legacy"),
+        TerminalLine.Output("Moving: BerlinDroid Organizer -> Freelance Lecturer & Yubico Expert"),
+        TerminalLine.Output("Success: Legacy immutable. New adventure starting..."),
+        TerminalLine.Spacer,
+    )
+
+    @Composable
+    override fun LeftContent() {
+        var visibleLines by remember { mutableStateOf<List<Pair<TerminalLine, String>>>(emptyList()) }
+        var isLeftFinished by remember { mutableStateOf(false) }
+        val scrollState = rememberScrollState()
+
+        LaunchedEffect(Unit) {
+            // Reset all states when entering the page
+            LeftAnimationFinished.value = false
+            visibleLines = emptyList()
+            isLeftFinished = false
+
+            leftLines.forEach { line ->
+                when (line) {
+                    is TerminalLine.Command -> {
+                        line.text.forEachIndexed { index, _ ->
+                            val typed = line.text.substring(0, index + 1)
+                            if (visibleLines.lastOrNull()?.first == line) {
+                                visibleLines = visibleLines.dropLast(1) + (line to typed)
+                            } else {
+                                visibleLines = visibleLines + (line to typed)
+                            }
+                            delay(80) // Slower typing
+                        }
+                        delay(500) // Pause after command
+                    }
+
+                    is TerminalLine.Output -> {
+                        visibleLines = visibleLines + (line to line.text)
+                        delay(200) // Slower output
+                    }
+
+                    is TerminalLine.Spacer -> {
+                        visibleLines = visibleLines + (line to "")
+                    }
+                }
+            }
+            isLeftFinished = true
+            delay(500) // Pause before triggering right side
+            LeftAnimationFinished.value = true
+        }
+
+        LaunchedEffect(visibleLines) {
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+
+        // We use a side effect to notify the RightContent, but in this architecture 
+        // we can use a more robust approach if RightContent and LeftContent shared a VM.
+        // For now, let's use a simple composition-local or similar if needed, 
+        // but since they are in the same object, we can manage it.
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(TerminalBg)
+                .padding(32.dp)
+                .verticalScroll(scrollState)
+        ) {
+            visibleLines.forEachIndexed { index, (line, text) ->
+                val isLast = index == visibleLines.size - 1
+                when (line) {
+                    is TerminalLine.Command -> {
+                        Row {
+                            TerminalPrompt(text)
+                            if (isLast && !isLeftFinished) {
+                                TerminalCursor()
+                            }
+                        }
+                    }
+
+                    is TerminalLine.Output -> TerminalOutput(text)
+                    is TerminalLine.Spacer -> Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+
+            if (isLeftFinished) {
+                BlinkingCursorPrompt()
+                // Update a global/shared state if we want RightContent to react.
+                // Since LeftContent and RightContent are called independently by the Pager, 
+                // we should ideally use a shared state.
+                LaunchedEffect(Unit) {
+                    LeftAnimationFinished.value = true
+                }
+            }
+        }
+    }
+
+    private val LeftAnimationFinished = mutableStateOf(false)
+
+    @Composable
+    override fun RightContent() {
+        val fullMessage = """
+            Executing gratitude_script.py...
+            
+            > Initializing farewell sequence...
+            > Analyzing 11 years of impact...
+            
+            Hey Mario,
+            
+            Since I moved into Berlin I joined the community you brought together and enjoyed since then. 
+            
+            Thanks for all the great work all these years. We will miss your creative ideas at droidcon berlins.
+            
+            Wishing you a 'successful build' in your next adventure at SRH University and Yubico!
+            
+            — @mohsenoid
+            
+            -- End of Transmission --
+        """.trimIndent()
+
+        var visibleText by remember { mutableStateOf("") }
+        val scrollState = rememberScrollState()
+        val isStarted by LeftAnimationFinished
+
+        LaunchedEffect(isStarted) {
+            if (isStarted) {
+                fullMessage.forEachIndexed { index, _ ->
+                    visibleText = fullMessage.substring(0, index + 1)
+                    delay(if (fullMessage[index] == '\n') 150 else 40) // Slower typing
+                }
+            } else {
+                visibleText = "" // Reset text if not started
+            }
+        }
+
+        // Auto-scroll as text grows
+        LaunchedEffect(visibleText) {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(TerminalBg)
+                .padding(48.dp)
+                .verticalScroll(scrollState)
+        ) {
+            if (isStarted) {
+                Text(
+                    text = visibleText,
+                    color = TerminalBlue,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Monospace,
+                    lineHeight = 30.sp
+                )
+
+                if (visibleText.length == fullMessage.length) {
+                    Box(modifier = Modifier.align(Alignment.End)) {
+                        Text(
+                            text = "SUCCESS",
+                            color = TerminalGreen,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun TerminalPrompt(command: String) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color.White)) {
+                    append("mario@berlindroid")
+                }
+                withStyle(style = SpanStyle(color = TerminalBlue)) {
+                    append(":")
+                }
+                withStyle(style = SpanStyle(color = Color.Yellow)) {
+                    append("~")
+                }
+                withStyle(style = SpanStyle(color = Color.White)) {
+                    append("$ ")
+                }
+                withStyle(style = SpanStyle(color = TerminalGreen)) {
+                    append(command)
+                }
+            },
+            fontFamily = FontFamily.Monospace,
+            fontSize = 18.sp
+        )
+    }
+
+    @Composable
+    private fun TerminalOutput(text: String) {
+        Text(
+            text = text,
+            color = Color.LightGray,
+            fontFamily = FontFamily.Monospace,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+
+    @Composable
+    private fun BlinkingCursorPrompt() {
+        val infiniteTransition = rememberInfiniteTransition(label = "cursor")
+        val alpha by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 0f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(500, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "alpha"
+        )
+
+        Row {
+            TerminalPrompt("")
+            Box(
+                modifier = Modifier
+                    .size(width = 10.dp, height = 20.dp)
+                    .background(Color.White.copy(alpha = alpha))
+                    .align(Alignment.CenterVertically)
+            )
+        }
+    }
+}
