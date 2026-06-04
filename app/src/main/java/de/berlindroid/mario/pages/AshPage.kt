@@ -69,8 +69,8 @@ object AshPage : Page {
             contentDescription = "Ellie",
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(4.dp))
-                .padding(4.dp),
+                .padding(32.dp)
+                .clip(RoundedCornerShape(32.dp)),
             contentScale = ContentScale.Crop
         )
     }
