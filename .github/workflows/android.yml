@@ -18,6 +18,16 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: 3.44.1
+    - name: Run Flutter Pub Get # trigger android gradle module to be generated
+      run: flutter pub get
+      working-directory: flutter_module
+
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
       with:
