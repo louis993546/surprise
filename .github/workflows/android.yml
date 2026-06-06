@@ -23,6 +23,7 @@ jobs:
       with:
         channel: stable
         flutter-version: 3.44.1
+    - run: flutter pub get # trigger android gradle module to be generated
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
