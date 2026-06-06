@@ -18,6 +18,12 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: 3.12.0
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
       with:
