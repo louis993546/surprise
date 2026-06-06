@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.metro) apply false
+    alias(libs.plugins.metro)
 }
 
 val shouldIncludeFlutter = if (gradle.extensions.extraProperties.has("mario.includeFlutter")) {
@@ -9,9 +9,6 @@ val shouldIncludeFlutter = if (gradle.extensions.extraProperties.has("mario.incl
 } else {
     true
 }
-
-apply(plugin = "dev.zacsweers.metro")
-
 
 android {
     namespace = "de.berlindroid.mario"
