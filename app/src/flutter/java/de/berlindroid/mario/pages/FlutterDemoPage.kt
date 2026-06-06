@@ -4,10 +4,18 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +37,8 @@ import io.flutter.embedding.android.ExclusiveAppComponent
 import io.flutter.embedding.android.FlutterTextureView
 import io.flutter.embedding.android.FlutterView
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.dart.DartExecutor
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor.DartEntrypoint
 
 @ContributesIntoSet(AppScope::class)
 object FlutterDemoPage : Page {
@@ -101,12 +110,12 @@ object FlutterDemoPage : Page {
 
         // We retrieve the pre-warmed FlutterEngine from cache, or fall back to creating one
         val flutterEngine = remember(context) {
-            io.flutter.embedding.engine.FlutterEngineCache.getInstance().get("mario_flutter_engine")
-                ?: io.flutter.embedding.engine.FlutterEngine(context).apply {
+            FlutterEngineCache.getInstance().get("mario_flutter_engine")
+                ?: FlutterEngine(context).apply {
                     dartExecutor.executeDartEntrypoint(
-                        io.flutter.embedding.engine.dart.DartExecutor.DartEntrypoint.createDefault()
+                        DartEntrypoint.createDefault()
                     )
-                    io.flutter.embedding.engine.FlutterEngineCache.getInstance().put("mario_flutter_engine", this)
+                    FlutterEngineCache.getInstance().put("mario_flutter_engine", this)
                 }
         }
 

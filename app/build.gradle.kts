@@ -1,8 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.metro)
+    alias(libs.plugins.metro) apply false
 }
+
+val shouldIncludeFlutter = if (gradle.extensions.extraProperties.has("mario.includeFlutter")) {
+    gradle.extensions.extraProperties.get("mario.includeFlutter") as Boolean
+} else {
+    true
+}
+
+apply(plugin = "dev.zacsweers.metro")
+
 
 android {
     namespace = "de.berlindroid.mario"
@@ -35,10 +44,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs(if (shouldIncludeFlutter) "src/flutter/java" else "src/noFlutter/java")
+        }
+    }
 }
 
 dependencies {
-    implementation(project(":flutter"))
+    if (shouldIncludeFlutter) {
+        implementation(project(":flutter"))
+    }
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout.compose)
