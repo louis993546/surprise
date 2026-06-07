@@ -9,7 +9,13 @@ on:
 jobs:
   debug-build:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v6
     - name: set up JDK 21
@@ -37,6 +43,7 @@ jobs:
       run: ./gradlew assembleDebug
 
     - name: Upload Debug APK
+      if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v7
       with:
         name: debug-apk
