@@ -9,7 +9,13 @@ on:
 jobs:
   debug-build:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v6
     - name: set up JDK 21
@@ -17,6 +23,16 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: 3.44.1
+    - name: Run Flutter Pub Get # trigger android gradle module to be generated
+      run: flutter pub get
+      working-directory: flutter_module
+
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
@@ -27,6 +43,7 @@ jobs:
       run: ./gradlew assembleDebug
 
     - name: Upload Debug APK
+      if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v7
       with:
         name: debug-apk
