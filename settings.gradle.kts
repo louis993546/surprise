@@ -27,4 +27,10 @@ dependencyResolutionManagement {
 rootProject.name = "mario"
 include(":app")
 val filePath = "$settingsDir/flutter_module/.android/include_flutter.groovy"
-apply(from = File(filePath))
+val flutterInclude = File(filePath)
+check(flutterInclude.exists()) {
+    "Missing Flutter generated Android wrapper at $filePath. " +
+        "Install the Flutter SDK, then run `cd flutter_module && flutter pub get` " +
+        "to generate .android before building the host app."
+}
+apply(from = flutterInclude)
