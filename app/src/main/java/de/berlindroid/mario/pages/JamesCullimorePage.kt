@@ -126,6 +126,7 @@ private fun BadgeDispatchPage() {
             Spacer(modifier = Modifier.height(22.dp))
             BadgeScreen(
                 text = dispatch,
+                typingProgress = motion.typingProgress,
                 cursorAlpha = motion.cursor,
                 scan = motion.scan
             )
@@ -146,9 +147,13 @@ private fun BadgeDispatchPage() {
 @Composable
 private fun BadgeScreen(
     text: String,
+    typingProgress: Float,
     cursorAlpha: Float,
     scan: Float
 ) {
+    val typedLength = (text.length * typingProgress).toInt().coerceIn(0, text.length)
+    val typedText = text.take(typedLength)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -161,7 +166,7 @@ private fun BadgeScreen(
     ) {
         EInkTexture(scan = scan, modifier = Modifier.fillMaxSize())
         Text(
-            text = text + if (cursorAlpha > 0.5f) "█" else "",
+            text = typedText + if (cursorAlpha > 0.5f) "█" else "",
             color = Color(0xFF172117),
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
@@ -680,6 +685,19 @@ private fun rememberFarewellMotion(): FarewellMotion {
         animationSpec = infiniteRepeatable(tween(520, easing = LinearEasing), RepeatMode.Reverse),
         label = "cursor"
     )
+    val typingProgress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            keyframes {
+                durationMillis = 8200
+                0f at 0
+                1f at 4300
+                1f at 8200
+            }
+        ),
+        label = "typingProgress"
+    )
     val peekTravel by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -721,6 +739,7 @@ private fun rememberFarewellMotion(): FarewellMotion {
         scan = scan,
         reveal = reveal,
         cursor = cursor,
+        typingProgress = typingProgress,
         peekTravel = peekTravel,
         peekAlpha = peekAlpha
     )
@@ -733,6 +752,7 @@ private data class FarewellMotion(
     val scan: Float,
     val reveal: Float,
     val cursor: Float,
+    val typingProgress: Float,
     val peekTravel: Float,
     val peekAlpha: Float
 )
