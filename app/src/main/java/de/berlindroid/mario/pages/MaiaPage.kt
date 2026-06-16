@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,8 +24,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +45,7 @@ import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
+import kotlin.math.roundToInt
 
 data class Bubble(
     val id: Int,
@@ -203,16 +208,243 @@ object MaiaPage : Page {
         }
     }
 
+    private fun countNeighbors(row: Int, col: Int, size: Int, liveCells: Set<Pair<Int, Int>>): Int {
+        var count = 0
+        for (dr in -1..1) {
+            for (dc in -1..1) {
+                if (dr == 0 && dc == 0) continue
+                val r = (row + dr + size) % size
+                val c = (col + dc + size) % size
+                if (liveCells.contains(r to c)) {
+                    count++
+                }
+            }
+        }
+        return count
+    }
+
+    private fun nextGeneration(currentCells: Set<Pair<Int, Int>>, size: Int): Set<Pair<Int, Int>> {
+        val next = mutableSetOf<Pair<Int, Int>>()
+        for (r in 0 until size) {
+            for (c in 0 until size) {
+                val neighbors = countNeighbors(r, c, size, currentCells)
+                val isAlive = currentCells.contains(r to c)
+                if (isAlive) {
+                    if (neighbors == 2 || neighbors == 3) {
+                        next.add(r to c)
+                    }
+                } else {
+                    if (neighbors == 3) {
+                        next.add(r to c)
+                    }
+                }
+            }
+        }
+        return next
+    }
+
+    private fun randomizeGrid(size: Int): Set<Pair<Int, Int>> {
+        val randomCells = mutableSetOf<Pair<Int, Int>>()
+        for (r in 0 until size) {
+            for (c in 0 until size) {
+                if (kotlin.random.Random.nextFloat() < 0.25f) { // 25% fill rate
+                    randomCells.add(r to c)
+                }
+            }
+        }
+        return randomCells
+    }
+
     @Composable
     override fun RightContent() {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        var gridSize by remember { mutableStateOf(15) }
+        var liveCells by remember { mutableStateOf(emptySet<Pair<Int, Int>>()) }
+        var isRunning by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isRunning, gridSize) {
+            if (isRunning) {
+                while (isRunning) {
+                    kotlinx.coroutines.delay(250)
+                    val next = nextGeneration(liveCells, gridSize)
+                    if (next == liveCells || next.isEmpty()) {
+                        liveCells = next
+                        isRunning = false
+                    } else {
+                        liveCells = next
+                    }
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Coming soon...",
-                style = MaterialTheme.typography.headlineMedium
-            )
+            // 1. Header
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Text(
+                    text = "Game of Life Simulator",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Tap cells to design. Toggle Run to see it evolve.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+            }
+
+            // 2. Interactive Grid
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    .padding(12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    for (r in 0 until gridSize) {
+                        Row(
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            for (c in 0 until gridSize) {
+                                val isAlive = liveCells.contains(r to c)
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(3.dp))
+                                        .background(
+                                            if (isAlive) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                        )
+                                        .clickable {
+                                            if (!isRunning) {
+                                                liveCells = if (isAlive) liveCells - (r to c) else liveCells + (r to c)
+                                            }
+                                        }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 3. Grid Size Slider
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Size: ${gridSize}x${gridSize}",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.width(110.dp)
+                )
+                Slider(
+                    value = gridSize.toFloat(),
+                    onValueChange = {
+                        gridSize = it.roundToInt()
+                        liveCells = liveCells.filter { cell ->
+                            cell.first < gridSize && cell.second < gridSize
+                        }.toSet()
+                    },
+                    valueRange = 8f..25f,
+                    enabled = !isRunning,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // 4. Controls Buttons
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = { isRunning = !isRunning },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isRunning) Color(0xFFE53935) else Color(0xFF43A047)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.width(110.dp)
+                ) {
+                    Text(
+                        text = if (isRunning) "Stop" else "Run",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        liveCells = emptySet()
+                        isRunning = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.width(110.dp)
+                ) {
+                    Text(
+                        text = "Clear",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        liveCells = randomizeGrid(gridSize)
+                    },
+                    enabled = !isRunning,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.width(110.dp)
+                ) {
+                    Text(
+                        text = "Randomize",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+            }
+
+            // 5. "Life goes on" message below the grid controls
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isRunning) {
+                    Text(
+                        text = "Life goes on",
+                        fontFamily = fontFamily,
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }
