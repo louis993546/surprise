@@ -37,10 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
@@ -287,14 +289,15 @@ object MaiaPage : Page {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp),
+                    .height(90.dp),
                 contentAlignment = Alignment.Center
             ) {
                 if (isRunning) {
                     Text(
                         text = "Life goes on",
                         fontFamily = fontFamily,
-                        style = MaterialTheme.typography.displayMedium,
+                        fontSize = 56.sp,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center
                     )
@@ -424,7 +427,7 @@ object MaiaPage : Page {
                     modifier = Modifier.width(110.dp)
                 ) {
                     Text(
-                        text = "Randomize",
+                        text = "Random",
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
