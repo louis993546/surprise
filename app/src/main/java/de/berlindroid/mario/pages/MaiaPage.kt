@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +49,7 @@ import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 data class Bubble(
     val id: Int,
@@ -259,14 +261,14 @@ object MaiaPage : Page {
 
     @Composable
     override fun RightContent() {
-        var gridSize by remember { mutableStateOf(15) }
+        var gridSize by remember { mutableIntStateOf(15) }
         var liveCells by remember { mutableStateOf(emptySet<Pair<Int, Int>>()) }
         var isRunning by remember { mutableStateOf(false) }
 
         LaunchedEffect(isRunning, gridSize) {
             if (isRunning) {
                 while (isRunning) {
-                    kotlinx.coroutines.delay(250)
+                    kotlinx.coroutines.delay(250.milliseconds)
                     val next = nextGeneration(liveCells, gridSize)
                     if (next == liveCells || next.isEmpty()) {
                         liveCells = next
