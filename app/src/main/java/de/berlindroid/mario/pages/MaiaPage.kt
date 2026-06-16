@@ -262,7 +262,17 @@ object MaiaPage : Page {
     @Composable
     override fun RightContent() {
         var gridSize by remember { mutableIntStateOf(15) }
-        var liveCells by remember { mutableStateOf(emptySet<Pair<Int, Int>>()) }
+        var liveCells by remember {
+            mutableStateOf(
+                setOf(
+                    1 to 2,
+                    2 to 3,
+                    3 to 1,
+                    3 to 2,
+                    3 to 3
+                )
+            )
+        }
         var isRunning by remember { mutableStateOf(false) }
 
         LaunchedEffect(isRunning, gridSize) {
