@@ -283,21 +283,22 @@ object MaiaPage : Page {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 1. Header
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(bottom = 12.dp)
+            // 1. Header: Displays "Life goes on" when running
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Game of Life Simulator",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = "Tap cells to design. Toggle Run to see it evolve.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                )
+                if (isRunning) {
+                    Text(
+                        text = "Life goes on",
+                        fontFamily = fontFamily,
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
             // 2. Interactive Grid
@@ -343,7 +344,8 @@ object MaiaPage : Page {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Increased padding between the grid simulator and the slider
+            Spacer(modifier = Modifier.height(32.dp))
 
             // 3. Grid Size Slider
             Row(
@@ -428,23 +430,14 @@ object MaiaPage : Page {
                 }
             }
 
-            // 5. "Life goes on" message below the grid controls
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isRunning) {
-                    Text(
-                        text = "Life goes on",
-                        fontFamily = fontFamily,
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
+            // 5. Instructions moved below the buttons
+            Text(
+                text = "Tap cells to design. Toggle Run to see it evolve.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
     }
 }
