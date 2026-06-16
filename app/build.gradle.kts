@@ -44,7 +44,8 @@ android {
 
     sourceSets {
         getByName("main") {
-            java.srcDirs(if (shouldIncludeFlutter) "src/flutter/java" else "src/noFlutter/java")
+            val folder = if (shouldIncludeFlutter) "src/flutter/java" else "src/noFlutter/java"
+            kotlin.directories += folder
         }
     }
 }
