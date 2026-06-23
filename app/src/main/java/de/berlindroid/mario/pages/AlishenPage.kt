@@ -12,9 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -26,15 +25,10 @@ import dev.zacsweers.metro.ContributesIntoSet
 @ContributesIntoSet(AppScope::class)
 object AlishenPage : Page {
 
-    private val fontFamily by lazy(LazyThreadSafetyMode.NONE) {
+    private val fontFamily by lazy {
         FontFamily(
             Font(
-                googleFont = GoogleFont("Caveat"),
-                fontProvider = GoogleFont.Provider(
-                    providerAuthority = "com.google.android.gms.fonts",
-                    providerPackage = "com.google.android.gms",
-                    certificates = R.array.com_google_android_gms_fonts_certs
-                ),
+                R.font.caveat_variable_font_wght,
             )
         )
     }
