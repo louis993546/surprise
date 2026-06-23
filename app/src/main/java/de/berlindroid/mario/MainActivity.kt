@@ -31,9 +31,6 @@ import de.berlindroid.mario.di.AppGraph
 import de.berlindroid.mario.ui.flip.FlipPager
 import de.berlindroid.mario.ui.flip.FlipPagerOrientation
 import de.berlindroid.mario.ui.theme.MarioTheme
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
 import timber.log.Timber
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
@@ -49,15 +46,6 @@ val LocalPageIndex = compositionLocalOf { -1 }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Pre-warm Flutter Engine
-        val flutterEngine = FlutterEngine(this).apply {
-            dartExecutor.executeDartEntrypoint(
-                DartExecutor.DartEntrypoint.createDefault()
-            )
-        }
-        FlutterEngineCache.getInstance().put("mario_flutter_engine", flutterEngine)
-
         val appGraph = (application as MarioApplication).dependencyGraph
         enableEdgeToEdge()
         setContent {
@@ -67,13 +55,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        // Clean up pre-warmed Flutter Engine
-        FlutterEngineCache.getInstance().get("mario_flutter_engine")?.destroy()
-        FlutterEngineCache.getInstance().remove("mario_flutter_engine")
-        super.onDestroy()
     }
 }
 
