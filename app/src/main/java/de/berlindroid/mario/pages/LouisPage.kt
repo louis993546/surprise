@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
@@ -45,28 +46,52 @@ import dev.zacsweers.metro.ContributesIntoSet
 @ContributesIntoSet(AppScope::class)
 object LouisPage : Page {
 
-    override val title: String = "Louis' Soundboard"
+    override val title: String = "Soundboard"
     override val author: String = "Louis"
 
-    private val leftNames = listOf(
-        "actually", "again", "ah", "and",
-        "android", "apps", "can", "cats",
-        "cketti", "fasciam", "german", "great",
-        "happy", "i", "if", "is"
+    private val leftSounds = listOf(
+        "actually" to R.raw.sb_actually,
+        "again" to R.raw.sb_again,
+        "ah" to R.raw.sb_ah,
+        "and" to R.raw.sb_and,
+        "android" to R.raw.sb_android,
+        "apps" to R.raw.sb_apps,
+        "can" to R.raw.sb_can,
+        "cats" to R.raw.sb_cats,
+        "cketti" to R.raw.sb_cketti,
+        "fascism" to R.raw.sb_fascism,
+        "german" to R.raw.sb_german,
+        "great" to R.raw.sb_great,
+        "happy" to R.raw.sb_happy,
+        "i" to R.raw.sb_i,
+        "if" to R.raw.sb_if,
+        "is" to R.raw.sb_is
     )
 
-    private val rightNames = listOf(
-        "just", "kotlin", "like", "love",
-        "make", "ok", "question", "right",
-        "run", "so", "termux", "thank_you",
-        "this", "to", "um", "xr"
+    private val rightSounds = listOf(
+        "just" to R.raw.sb_just,
+        "kotlin" to R.raw.sb_kotlin,
+        "like" to R.raw.sb_like,
+        "love" to R.raw.sb_love,
+        "make" to R.raw.sb_make,
+        "ok" to R.raw.sb_ok,
+        "question" to R.raw.sb_question,
+        "right" to R.raw.sb_right,
+        "run" to R.raw.sb_run,
+        "so" to R.raw.sb_so,
+        "termux" to R.raw.sb_termux,
+        "thank_you" to R.raw.sb_thank_you,
+        "this" to R.raw.sb_this,
+        "to" to R.raw.sb_to,
+        "um" to R.raw.sb_um,
+        "xr" to R.raw.sb_xr
     )
 
     @Composable
     override fun LeftContent() {
         Soundboard(
             title = "Mario Replicator",
-            buttonNames = leftNames
+            sounds = leftSounds
         )
     }
 
@@ -74,7 +99,7 @@ object LouisPage : Page {
     override fun RightContent() {
         Soundboard(
             title = "Mario Replicator",
-            buttonNames = rightNames,
+            sounds = rightSounds,
             byline = "by Louis"
         )
     }
@@ -83,7 +108,7 @@ object LouisPage : Page {
 @Composable
 fun Soundboard(
     title: String,
-    buttonNames: List<String>,
+    sounds: List<Pair<String, Int>>,
     byline: String? = null
 ) {
     val context = LocalContext.current
@@ -102,10 +127,8 @@ fun Soundboard(
 
     val soundIds = remember { mutableStateMapOf<String, Int>() }
 
-    LaunchedEffect(buttonNames) {
-        buttonNames.forEach { name ->
-            val cleanName = "sb_" + name.lowercase().trim()
-            val resId = context.resources.getIdentifier(cleanName, "raw", context.packageName)
+    LaunchedEffect(sounds) {
+        sounds.forEach { (name, resId) ->
             if (resId != 0) {
                 soundIds[name] = soundPool.load(context, resId, 1)
             } else {
@@ -146,8 +169,8 @@ fun Soundboard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(buttonNames.size) { index ->
-                    val name = buttonNames[index]
+                items(sounds.size) { index ->
+                    val (name, _) = sounds[index]
                     SoundButton(
                         label = name,
                         onClick = {
