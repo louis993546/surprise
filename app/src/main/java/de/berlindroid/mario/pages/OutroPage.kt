@@ -1,7 +1,6 @@
 package de.berlindroid.mario.pages
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import de.berlindroid.mario.LocalAppGraph
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
@@ -48,7 +48,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 object OutroPage : Page {
 
     override val title: String = "Contributors"
-    override val author: String = "The Maintainers"
+    override val author: String = ""
     override val category: PageCategory = PageCategory.Outro
 
     private val fontFamily = FontFamily(
@@ -275,7 +275,7 @@ object OutroPage : Page {
             Button(
                 onClick = {
                     val githubUrl = "https://github.com/louis993546/surprise"
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+                    val intent = Intent(Intent.ACTION_VIEW, githubUrl.toUri())
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(

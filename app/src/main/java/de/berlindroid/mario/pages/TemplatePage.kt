@@ -7,9 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
-import dev.zacsweers.metro.ContributesIntoSet
 
 /**
  * Template for a new page in the thank you book.
