@@ -46,7 +46,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 @ContributesIntoSet(AppScope::class)
 object LouisPage : Page {
 
-    override val title: String = "Louis' Soundboard"
+    override val title: String = "Soundboard"
     override val author: String = "Louis"
 
     private val leftSounds = listOf(
@@ -59,7 +59,7 @@ object LouisPage : Page {
         "can" to R.raw.sb_can,
         "cats" to R.raw.sb_cats,
         "cketti" to R.raw.sb_cketti,
-        "fasciam" to R.raw.sb_fasciam,
+        "fascism" to R.raw.sb_fascism,
         "german" to R.raw.sb_german,
         "great" to R.raw.sb_great,
         "happy" to R.raw.sb_happy,

@@ -37,7 +37,7 @@ jobs:
         path: app/build/outputs/apk/debug/app-debug.apk
 
   release-build:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
