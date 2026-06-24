@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -37,7 +38,7 @@ object IntroPage : Page {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Thank you, Mario!",
+                text = stringResource(R.string.intro_thank_you_title),
                 style = MaterialTheme.typography.displayLarge,
                 textAlign = TextAlign.Center,
                 fontFamily = fontFamily,
@@ -54,7 +55,7 @@ object IntroPage : Page {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Thank you for all the years of hard work.\nWe will still see you around as an attendee instead of organizer!",
+                text = stringResource(R.string.intro_thank_you_body),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 fontFamily = fontFamily,

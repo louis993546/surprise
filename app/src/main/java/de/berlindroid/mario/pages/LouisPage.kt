@@ -73,8 +73,9 @@ object LouisPage : Page {
     @Composable
     override fun RightContent() {
         Soundboard(
-            title = "- Louis",
-            buttonNames = rightNames
+            title = "Mario Replicator",
+            buttonNames = rightNames,
+            byline = "by Louis"
         )
     }
 }
@@ -82,7 +83,8 @@ object LouisPage : Page {
 @Composable
 fun Soundboard(
     title: String,
-    buttonNames: List<String>
+    buttonNames: List<String>,
+    byline: String? = null
 ) {
     val context = LocalContext.current
     
@@ -118,40 +120,55 @@ fun Soundboard(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineLarge.copy(color = Color.White),
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            items(buttonNames.size) { index ->
-                val name = buttonNames[index]
-                SoundButton(
-                    label = name,
-                    onClick = {
-                        val soundId = soundIds[name] ?: 0
-                        if (soundId != 0) {
-                            soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineLarge.copy(color = Color.White),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(buttonNames.size) { index ->
+                    val name = buttonNames[index]
+                    SoundButton(
+                        label = name,
+                        onClick = {
+                            val soundId = soundIds[name] ?: 0
+                            if (soundId != 0) {
+                                  soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+        }
+
+        if (byline != null) {
+            Text(
+                text = byline,
+                style = MaterialTheme.typography.labelMedium.copy(color = Color.Gray),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            )
         }
     }
 }

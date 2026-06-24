@@ -1,9 +1,9 @@
 package de.berlindroid.mario.pages
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.berlindroid.mario.LocalAppGraph
@@ -43,13 +44,6 @@ import de.berlindroid.mario.model.rememberSettingsState
 import de.berlindroid.mario.model.rememberSlideshowDelayState
 import dev.zacsweers.metro.ContributesIntoSet
 
-/**
- * TODO
- *   * Link to repo
- *   * Auto-flip?
- *   * Keep screen on?
- *   * Full on photo album mode?
- */
 @ContributesIntoSet(AppScope::class)
 object OutroPage : Page {
 
@@ -68,27 +62,27 @@ object OutroPage : Page {
         val autoFlipIntervalMinutes by autoFlipState
         val keepScreenOn by keepScreenOnState
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(48.dp),
-            contentAlignment = Alignment.Center
+                .padding(top = 32.dp, start = 48.dp, end = 48.dp, bottom = 48.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.width(360.dp)
-            ) {
-                Text(
-                    text = "Settings",
-                    style = MaterialTheme.typography.displayMedium,
-                    fontFamily = fontFamily,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
+            Text(
+                text = stringResource(R.string.outro_settings_title),
+                style = MaterialTheme.typography.displayMedium,
+                fontFamily = fontFamily,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
 
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.Start
+            ) {
                 // Keep Screen On Setting
                 Text(
-                    text = "Keep Screen On",
+                    text = stringResource(R.string.outro_keep_screen_on_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = fontFamily,
                 )
@@ -98,7 +92,7 @@ object OutroPage : Page {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Prevent device from sleeping while reading",
+                        text = stringResource(R.string.outro_keep_screen_on_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         fontFamily = fontFamily,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
@@ -116,13 +110,13 @@ object OutroPage : Page {
 
                 // Auto Flip Setting
                 Text(
-                    text = "Auto Flip Pages",
+                    text = stringResource(R.string.outro_auto_flip_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = fontFamily,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Automatically turn page after interval:",
+                    text = stringResource(R.string.outro_auto_flip_desc),
                     style = MaterialTheme.typography.bodyMedium,
                     fontFamily = fontFamily,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
@@ -134,10 +128,10 @@ object OutroPage : Page {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val options = listOf(
-                        0 to "Off",
-                        1 to "1 Min",
-                        5 to "5 Min",
-                        15 to "15 Min"
+                        0 to stringResource(R.string.outro_label_off),
+                        1 to stringResource(R.string.outro_label_1_min),
+                        5 to stringResource(R.string.outro_label_5_min),
+                        15 to stringResource(R.string.outro_label_15_min)
                     )
                     options.forEach { (minutes, label) ->
                         val isSelected = autoFlipIntervalMinutes == minutes
@@ -171,7 +165,7 @@ object OutroPage : Page {
 
                 // Gallery Mode Setting
                 Text(
-                    text = "Gallery Slideshow",
+                    text = stringResource(R.string.outro_gallery_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = fontFamily,
                 )
@@ -185,14 +179,14 @@ object OutroPage : Page {
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     val options = listOf(
-                        60000L to "1m",
-                        300000L to "5m",
-                        1500000L to "15m",
-                        3000000L to "30m",
-                        6000000L to "1h",
-                        24000000L to "4h",
-                        72000000L to "12h",
-                        144000000L to "24h",
+                        60000L to stringResource(R.string.outro_label_1m),
+                        300000L to stringResource(R.string.outro_label_5m),
+                        1500000L to stringResource(R.string.outro_label_15m),
+                        3000000L to stringResource(R.string.outro_label_30m),
+                        6000000L to stringResource(R.string.outro_label_1h),
+                        24000000L to stringResource(R.string.outro_label_4h),
+                        72000000L to stringResource(R.string.outro_label_12h),
+                        144000000L to stringResource(R.string.outro_label_24h),
                     )
                     options.forEach { (delayMs, label) ->
                         val isSelected = currentDelayMs == delayMs
@@ -234,7 +228,7 @@ object OutroPage : Page {
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "Start Photo Slideshow",
+                        text = stringResource(R.string.outro_start_slideshow),
                         style = MaterialTheme.typography.labelLarge,
                         fontFamily = fontFamily
                     )
@@ -254,35 +248,69 @@ object OutroPage : Page {
                 .sorted()
         }
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(48.dp),
-            contentAlignment = Alignment.Center
+                .padding(top = 32.dp, start = 48.dp, end = 48.dp, bottom = 48.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                text = stringResource(R.string.outro_about_title),
+                style = MaterialTheme.typography.displayMedium,
+                fontFamily = fontFamily,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            Text(
+                text = stringResource(R.string.outro_about_desc),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = fontFamily,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            val context = LocalContext.current
+            Button(
+                onClick = {
+                    val githubUrl = "https://github.com/louis993546/surprise"
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = "Contributors",
-                    style = MaterialTheme.typography.displayMedium,
-                    textAlign = TextAlign.Center,
+                    text = stringResource(R.string.outro_view_github),
                     fontFamily = fontFamily,
+                    style = MaterialTheme.typography.labelLarge
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f, fill = false)
-                ) {
-                    items(contributors) { contributor ->
-                        Text(
-                            text = contributor,
-                            style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center,
-                            fontFamily = fontFamily,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = stringResource(R.string.outro_contributors_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LazyColumn(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(1f)
+            ) {
+                items(contributors) { contributor ->
+                    Text(
+                        text = "- $contributor",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = fontFamily,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
                 }
             }
         }

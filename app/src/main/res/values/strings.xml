@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">mario</string>
+    <string name="app_name">Mario</string>
+
+    <!-- Intro Page -->
+    <string name="intro_thank_you_title">Thank you, Mario!</string>
+    <string name="intro_thank_you_body">Thank you for all the years of hard work.\nWe will still see you around as an attendee instead of organizer!</string>
+
+    <!-- Outro Page -->
+    <string name="outro_settings_title">Settings</string>
+    <string name="outro_keep_screen_on_title">Keep Screen On</string>
+    <string name="outro_keep_screen_on_desc">Prevent device from sleeping while reading</string>
+    <string name="outro_auto_flip_title">Auto Flip Pages</string>
+    <string name="outro_auto_flip_desc">Automatically turn page after interval:</string>
+    <string name="outro_gallery_title">Gallery Slideshow</string>
+    <string name="outro_start_slideshow">Start Photo Slideshow</string>
+    <string name="outro_about_title">About</string>
+    <string name="outro_about_desc">This digital book was created as a collaborative thank-you gift for Mario, celebrating all the amazing contributions and memories.</string>
+    <string name="outro_view_github">View GitHub Repository</string>
+    <string name="outro_contributors_title">Contributors</string>
+
+    <!-- Outro Page Labels -->
+    <string name="outro_label_off">Off</string>
+    <string name="outro_label_1_min">1 Min</string>
+    <string name="outro_label_5_min">5 Min</string>
+    <string name="outro_label_15_min">15 Min</string>
+    <string name="outro_label_1m">1m</string>
+    <string name="outro_label_5m">5m</string>
+    <string name="outro_label_15m">15m</string>
+    <string name="outro_label_30m">30m</string>
+    <string name="outro_label_1h">1h</string>
+    <string name="outro_label_4h">4h</string>
+    <string name="outro_label_12h">12h</string>
+    <string name="outro_label_24h">24h</string>
 </resources>
