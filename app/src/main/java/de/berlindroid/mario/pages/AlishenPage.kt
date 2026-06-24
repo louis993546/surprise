@@ -1,5 +1,6 @@
 package de.berlindroid.mario.pages
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
@@ -26,18 +26,9 @@ import dev.zacsweers.metro.ContributesIntoSet
 @ContributesIntoSet(AppScope::class)
 object AlishenPage : Page {
 
-    private val fontFamily by lazy(LazyThreadSafetyMode.NONE) {
-        FontFamily(
-            Font(
-                googleFont = GoogleFont("Caveat"),
-                fontProvider = GoogleFont.Provider(
-                    providerAuthority = "com.google.android.gms.fonts",
-                    providerPackage = "com.google.android.gms",
-                    certificates = R.array.com_google_android_gms_fonts_certs
-                ),
-            )
-        )
-    }
+    private val fontFamily = FontFamily(
+        Font(R.font.caveat_variable_font_wght)
+    )
 
     override val title = "Alishen Page"
     override val author = "Alishen"
@@ -76,8 +67,8 @@ object AlishenPage : Page {
 
     @Composable
     override fun RightContent() {
-        AsyncImage(
-            model = R.drawable.alishen_droidcon_2025,
+        Image(
+            painter = painterResource(R.drawable.alishen_droidcon_2025),
             contentDescription = "ZePatch booth at droidcon Berlin 2025",
             modifier = Modifier
                 .fillMaxSize()

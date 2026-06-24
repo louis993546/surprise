@@ -18,7 +18,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -26,15 +29,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import de.berlindroid.mario.di.AppGraph
+import de.berlindroid.mario.model.rememberSettingsState
 import de.berlindroid.mario.ui.flip.FlipPager
 import de.berlindroid.mario.ui.flip.FlipPagerOrientation
 import de.berlindroid.mario.ui.theme.MarioTheme
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
+import kotlinx.coroutines.delay
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
 
 val LocalAppGraph = staticCompositionLocalOf<AppGraph> {
     error("AppGraph not provided")
@@ -49,17 +56,14 @@ val LocalPageIndex = compositionLocalOf { -1 }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Pre-warm Flutter Engine
-        val flutterEngine = FlutterEngine(this).apply {
-            dartExecutor.executeDartEntrypoint(
-                DartExecutor.DartEntrypoint.createDefault()
-            )
-        }
-        FlutterEngineCache.getInstance().put("mario_flutter_engine", flutterEngine)
-
         val appGraph = (application as MarioApplication).dependencyGraph
         enableEdgeToEdge()
+
+        // Hide system bars for immersive full screen
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+
         setContent {
             CompositionLocalProvider(LocalAppGraph provides appGraph) {
                 MarioTheme {
@@ -67,13 +71,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        // Clean up pre-warmed Flutter Engine
-        FlutterEngineCache.getInstance().get("mario_flutter_engine")?.destroy()
-        FlutterEngineCache.getInstance().remove("mario_flutter_engine")
-        super.onDestroy()
     }
 }
 
@@ -88,6 +85,18 @@ fun AppContent() {
         list
     }
 
+    val (autoFlipState, keepScreenOnState) = rememberSettingsState()
+    val autoFlipIntervalMinutes by autoFlipState
+    val keepScreenOn by keepScreenOnState
+
+    val view = LocalView.current
+    DisposableEffect(keepScreenOn) {
+        view.keepScreenOn = keepScreenOn
+        onDispose {
+            view.keepScreenOn = false
+        }
+    }
+
     if (pages.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("The book is currently empty. Add a @ContributesIntoSet(AppScope::class) Page!")
@@ -96,6 +105,14 @@ fun AppContent() {
     }
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
+
+    LaunchedEffect(autoFlipIntervalMinutes, pagerState.currentPage, pagerState.pageCount) {
+        if (autoFlipIntervalMinutes > 0 && pagerState.pageCount > 1) {
+            delay((autoFlipIntervalMinutes * 60 * 1000L).milliseconds)
+            val nextPage = (pagerState.currentPage + 1) % pagerState.pageCount
+            pagerState.animateScrollToPage(nextPage)
+        }
+    }
 
     Box(
         modifier = Modifier

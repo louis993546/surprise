@@ -20,7 +20,7 @@ import dev.zacsweers.metro.ContributesIntoSet
  * 3. Add @ContributesIntoSet(AppScope::class) to the object.
  * 4. Implement your own Content composable.
  */
-@ContributesIntoSet(AppScope::class)
+//@ContributesIntoSet(AppScope::class) // Commented out so that it don't actually renders
 object TemplatePage : Page {
 
     override val title: String = "Template Page"
