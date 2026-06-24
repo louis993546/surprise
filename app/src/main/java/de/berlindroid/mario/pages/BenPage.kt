@@ -1,6 +1,7 @@
 package de.berlindroid.mario.pages
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,23 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +35,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
@@ -110,8 +105,8 @@ object BenPage : Page {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AsyncImage(
-                model = R.drawable.mario,
+            Image(
+                painter = painterResource(R.drawable.mario),
                 contentDescription = "Ellie",
                 modifier = Modifier
                     .fillMaxSize()
@@ -213,49 +208,6 @@ fun OutlinedText(
                 topLeft = topLeft,
                 drawStyle = Fill
             )
-        }
-    }
-}
-
-@Composable
-fun OutlinedTextO(
-    text: String,
-    modifier: Modifier = Modifier,
-    fontSize: TextUnit = 32.sp,
-    textColor: Color = Color.White,
-    outlineColor: Color = Color.Black,
-    outlineWidth: Float = 8f,
-    fontWeight: FontWeight = FontWeight.Normal
-) {
-    val density = LocalDensity.current
-
-    Canvas(
-        modifier = modifier.wrapContentSize()
-    ) {
-        val textSizePx = with(density) { fontSize.toPx() }
-
-        val strokePaint = android.graphics.Paint().apply {
-            isAntiAlias = true
-            color = outlineColor.toArgb()
-            textSize = textSizePx
-            style = android.graphics.Paint.Style.STROKE
-            strokeWidth = outlineWidth
-            textAlign = android.graphics.Paint.Align.LEFT
-        }
-
-        val fillPaint = android.graphics.Paint().apply {
-            isAntiAlias = true
-            color = textColor.toArgb()
-            textSize = textSizePx
-            style = android.graphics.Paint.Style.FILL
-            textAlign = android.graphics.Paint.Align.LEFT
-        }
-
-        val baseline = -strokePaint.fontMetrics.ascent
-
-        drawContext.canvas.nativeCanvas.apply {
-            drawText(text, 0f, baseline, strokePaint)
-            drawText(text, 0f, baseline, fillPaint)
         }
     }
 }

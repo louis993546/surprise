@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -44,7 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
@@ -83,9 +81,9 @@ object LucasVillaVerdePage : Page {
         )
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            AsyncImage(
+            Image(
                 modifier = Modifier.fillMaxSize(),
-                model = R.drawable.lucas_zebadge,
+                painter = painterResource(R.drawable.lucas_zebadge),
                 contentScale = ContentScale.Crop,
                 contentDescription = "Lucas ZeBadge thumbs up"
             )
@@ -196,14 +194,6 @@ object LucasVillaVerdePage : Page {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("The 'Chaos Experimenter': ") }
             append("The organizer’s main job is encouraging members to 'break things on purpose' just to see if their apps explode in creative ways.")
         }
-    )
-
-    // Colors
-    val dreamySunsetPalette = listOf(
-        Color(0xFFE1BEE7), // Soft Lavender
-        Color(0xFFFFCCBC), // Pale Peach
-        Color(0xFFFFF9C4), // Dreamy Cream
-        Color(0xFFB3E5FC)  // Soft Sky Blue
     )
 }
 

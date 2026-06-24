@@ -1,5 +1,7 @@
 package de.berlindroid.mario.pages
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,20 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.AsyncImage
-import coil3.compose.useExistingImageAsPlaceholder
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import de.berlindroid.mario.R
 import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
-import de.berlindroid.mario.model.PageCategory
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
@@ -57,7 +53,6 @@ private val PHOTOS = listOf(
     R.drawable.mario_cake,
 )
 
-@OptIn(ExperimentalCoilApi::class)
 @ContributesIntoSet(AppScope::class)
 class CkettiPage : Page {
     override val title: String = "TODO: insert title"
@@ -66,35 +61,34 @@ class CkettiPage : Page {
 
     @Composable
     override fun LeftContent() {
-        var model by remember { mutableStateOf<ImageRequest?>(null) }
+        var currentPhoto by remember { mutableIntStateOf(PHOTOS.first()) }
 
-        val context = LocalContext.current
         LaunchedEffect(key1 = Unit) {
             while (true) {
                 for (photo in PHOTOS) {
-                    model = ImageRequest.Builder(context)
-                        .data(photo)
-                        .crossfade(true)
-                        .useExistingImageAsPlaceholder(true)
-                        .build()
-
+                    currentPhoto = photo
                     delay(5.seconds)
                 }
             }
         }
 
-        AsyncImage(
-            model = model,
-            contentDescription = "Photos of Mario being Mario",
+        Crossfade(
+            targetState = currentPhoto,
             modifier = Modifier
                 .fillMaxSize()
                 .safeContentPadding()
                 .padding(16.dp)
                 .border(3.dp, Color.Black, RoundedCornerShape(32.dp))
                 .clip(RoundedCornerShape(32.dp))
-                .background(Color.White),
-            contentScale = ContentScale.Crop,
-        )
+                .background(Color.White)
+        ) { photo ->
+            Image(
+                painter = painterResource(photo),
+                contentDescription = "Photos of Mario being Mario",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 
     @Composable

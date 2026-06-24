@@ -41,6 +41,7 @@ import de.berlindroid.mario.di.AppScope
 import de.berlindroid.mario.model.Page
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @ContributesIntoSet(AppScope::class)
 object MohsenoidPage : Page {
@@ -125,14 +126,14 @@ object MohsenoidPage : Page {
                             line.text.indices.forEach { i ->
                                 val typed = line.text.substring(0, i + 1)
                                 visibleLines = visibleLines.updateLastOrAdd(line, typed)
-                                delay(80)
+                                delay(80.milliseconds)
                             }
-                            delay(500)
+                            delay(500.milliseconds)
                         }
 
                         is TerminalLine.Output -> {
                             visibleLines = visibleLines + (line to line.text)
-                            delay(200)
+                            delay(200.milliseconds)
                         }
 
                         is TerminalLine.Spacer -> {
@@ -141,7 +142,7 @@ object MohsenoidPage : Page {
                     }
                 }
                 isLeftFinished = true
-                delay(500)
+                delay(500.milliseconds)
                 LeftAnimationFinished.value = true
             } else {
                 LeftAnimationFinished.value = false
@@ -209,7 +210,7 @@ object MohsenoidPage : Page {
             if (isStarted) {
                 fullMessage.indices.forEach { i ->
                     visibleText = fullMessage.substring(0, i + 1)
-                    delay(if (fullMessage[i] == '\n') 150 else 40)
+                    delay((if (fullMessage[i] == '\n') 150 else 40).milliseconds)
                 }
             } else {
                 visibleText = ""
@@ -249,6 +250,7 @@ object MohsenoidPage : Page {
             if (isStarted) {
                 Text(
                     text = styledMessage,
+                    color = Color.LightGray,
                     fontSize = TerminalFontSizeMessage,
                     fontFamily = FontFamily.Monospace,
                     lineHeight = 30.sp
@@ -336,7 +338,9 @@ object MohsenoidPage : Page {
 
     private fun highlightTerminalText(text: String): androidx.compose.ui.text.AnnotatedString {
         return buildAnnotatedString {
-            append(text)
+            withStyle(SpanStyle(color = Color.LightGray)) {
+                append(text)
+            }
 
             // Patterns to highlight
             val highlights = listOf(
