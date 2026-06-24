@@ -12,14 +12,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,8 +24,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -452,50 +450,6 @@ private fun VoltronCard(
                 start = Offset(0f, y),
                 end = Offset(size.width, y),
                 strokeWidth = 5f
-            )
-        }
-    }
-}
-
-@Composable
-private fun JamesSticker(
-    modifier: Modifier,
-    rotation: Float,
-    label: String,
-    imageSize: Dp,
-    labelAlpha: Float
-) {
-    Column(
-        modifier = modifier.graphicsLayer {
-            rotationZ = rotation
-            alpha = 0.78f
-        },
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(R.drawable.james_sticker),
-            contentDescription = "James Cullimore sticker",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(imageSize)
-                .shadow(6.dp, CircleShape)
-                .clip(CircleShape)
-                .border(2.dp, Color.White.copy(alpha = 0.82f), CircleShape)
-        )
-        if (label.isNotBlank()) {
-            Text(
-                text = label,
-                color = Color.White,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                fontSize = 11.sp,
-                lineHeight = 13.sp,
-                modifier = Modifier
-                    .offset(y = (-6).dp)
-                    .clip(RoundedCornerShape(7.dp))
-                    .background(Color.Black.copy(alpha = labelAlpha))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }
